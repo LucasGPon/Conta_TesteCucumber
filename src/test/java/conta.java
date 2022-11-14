@@ -1,70 +1,110 @@
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
 
 public class conta {
-	private int saldo;
-	private String cliente;
+    private boolean cliente;
+    private int saldo;
 
-	/**
-	 * @param saldo Recebe saldo do cliente especial -200
-	 * 
-	 */
-	@Given("Um cliente especial com saldo atual de {int} reais")
-	public void um_cliente_especial_com_saldo_atual_de_reais(Integer saldo) {
-		cliente = "especial";
-		this.saldo = saldo;
-	}
+    /**
+     * 
+     * @param cliente Retorna valor de cliente
+     */
+    public boolean isClienteEspecial() {
+        return cliente;
+    }
 
-	/**
-	 * 
-	 * @param valorSacar Recebe valor a ser sacado pelo cliente especial
-	 */
-	@When("for solicitado um saque no valor de {int} reais")
-	public void for_solicitado_um_saque_no_valor_de_reais(Integer valorSacar) {
-		if (cliente == "especial") {
-			saldo -= valorSacar;
-		}
-	}
+    /**
+     * 
+     * @param saldo Retorna saldo do cliente
+     */
+    public int getSaldoAtual() {
+        return saldo;
+    }
 
-	/**
-	 * 
-	 * @param saldoAtual Atualiza saldo da conta do cliente
-	 */
-	@Then("deve efetuar o saque e atualizar o saldo da conta para {int} reais")
-	public void deve_efetuar_o_saque_e_atualizar_o_saldo_da_conta_para_reais(Integer saldoAtual) {
-		if (saldo == saldoAtual) {
-			System.out.println("Saque realizado com sucesso. " + "\n Saldo " + saldoAtual);
-		}
-	}
+    /**
+     * 
+     * @param cliente especial
+     */
+    public void clienteEspecial() {
+        this.cliente = true;
+    }
 
-	/**
-	 * 
-	 * @param saldo Saldo cliente comum
-	 */
-	@Given("um cliente comum com saldo atual de {int} reais")
-	public void um_cliente_comum_com_saldo_atual_de_reais(Integer saldo) {
-		cliente = "comum";
-		this.saldo = saldo;
-	}
+    /**
+     * 
+     * @param cliente comum
+     */
+    public void clienteComum() {
+        this.cliente = false;
+    }
+    
+    /**
+     * 
+     * @param saldo recebe saldo do cliente
+     */
+    public void setSaldoAtual(int saldo) {
+        this.saldo = saldo;
+    }
 
-	/**
-	 * 
-	 * @param valorSacar Recebe valor a ser sacado pelo cliente comum
-	 */
-	@When("solicitar um saque de {int} reais")
-	public void solicitar_um_saque_de_reais(Integer valorSacar) {
-		if (cliente == "comum") {
-			não_deve_efetuar_o_saque_e_deve_retornar_a_mensagem_saldo_insuficiente();
-		}
-	}
+    /**
+     * 
+     * @param valorDoSaque informar valor do saque para verificar elegibilidade cliente para sacar
+     * @exception Exception saldo insuficiente
+     */
+    public boolean sacar(int valorDoSaque) throws Exception {
+        // Se o saldo for ficar negativo
+        if (this.saldo < valorDoSaque) {
+            // E o cliente for especial
+            if (isClienteEspecial()) {
+                // Libera o saque e atualiza o saldo
+                this.atualizarSaldo(valorDoSaque);
+                return true;
+                // Se o cliente for comum
+            } else {
+                // Não libera o saque e retorna uma mensagem na Exception
+                throw new Exception("Saldo Insuficiente");
+            }
+            // Se o saldo for ficar positivo
+        } else {
+            // Libera o saque e atualiza o saldo
+            this.atualizarSaldo(valorDoSaque);
+            return true;
+        }
+    }
 
-	/**
-	 * 
-	 *@param Retorna mensagem de saldo insuficiente
-	 */
-	@Then("não deve efetuar o saque e deve retornar a mensagem Saldo Insuficiente")
-	public void não_deve_efetuar_o_saque_e_deve_retornar_a_mensagem_saldo_insuficiente() {
-		System.out.println("Saldo Insuficiente");
-	}
+    /**
+     * 
+     * @param valorDoSaque atualiza saldo cliente
+     */
+    private void atualizarSaldo(int valorDoSaque) {
+        this.saldo -= valorDoSaque;
+    }
+
+    /**
+     * 
+     * @param arg1 Informa saldo cliente
+     */
+    @Given("^Um cliente especial com saldo atual de -(\\d+) reais$")
+    public void um_cliente_especial_com_saldo_atual_de_reais(int arg1) throws Throwable {
+        clienteEspecial();
+        setSaldoAtual(arg1);
+    }
+
+    /**
+     * 
+     * @param arg1 Informa valor a sacar pelo cliente
+     */
+    @When("^for solicitado um saque no valor de (\\d+) reais$")
+    public void for_solicitado_um_saque_no_valor_de_reais(int arg1) throws Throwable {
+        sacar(arg1);
+    }
+
+    /**
+     * 
+     * @param arg1 saldo da conta deve ser atualizado
+     */
+    @Then("^deve efetuar o saque e atualizar o saldo da conta para -(\\d+) reais$")
+    public void deve_efetuar_o_saque_e_atualizar_o_saldo_da_conta_para_reais(int arg1) throws Throwable {
+        getSaldoAtual();
+    }
 }

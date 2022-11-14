@@ -1,5 +1,5 @@
 @tag
-Feature: Cliente faz saque em dinheir como um cliente, eu gostaria de sacar dinheiro em caixa eletrônico,
+Feature: Cliente faz saque em dinheiro como um cliente, eu gostaria de sacar dinheiro em caixa eletrônico,
 para que eu não tenha que esperar numa fila de banco.
 
   @tag1
